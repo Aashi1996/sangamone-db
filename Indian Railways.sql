@@ -1,81 +1,63 @@
-create database Indian_Railways;
-use Indian_Railways;
-
-drop table train;
-drop table station;
-drop table route;
+select * from train where route_id=1;
+describe fares;
 drop table fares;
-create table train (
-train_id int auto_increment primary key,
-train_no int,
-train_name varchar(60),
-train_type varchar(50),
-route_id int
-);
-
-create table station (
-station_id int auto_increment primary key,
-station_name varchar(60)
-);
-
-create table route (
-route_id int auto_increment primary key,
-start varchar(50),
-stop varchar(50),
-via varchar(100)
-);
-
 create table fares (
+fare_id int not null auto_increment primary key,
 train_id int,
-start_station varchar(50),
-stop_station varchar(50),
+start_station int,
+stop_station int,
+class_id int,
 fare int,
-primary key(train_id, start_station, stop_station)
+foreign key(train_id) references train(train_id),
+foreign key(start_station) references station(station_id),
+foreign key(stop_station) references station(station_id),
+foreign key(class_id) references class(class_id)
 );
 
-alter table train add foreign key(route_id) references route(route_id) on delete cascade;
-alter table fares add foreign key(train_id) references train(train_id) on delete cascade;
+drop table class;
+create table class (
+class_id int not null auto_increment primary key,
+class_name varchar(50)
+);
 
-insert into train(train_no, train_name, train_type, route_id) values(09017, 'HW FESTIVAL SPL', 'Shatabdi', 2);
-insert into train(train_no, train_name, train_type, route_id) values(09019, 'BDTS HW SPL', 'Express', 1);
-insert into train(train_no, train_name, train_type, route_id) values(04417, 'NZM FESTIVAL SPL', 'Passenger', 2);
-insert into train(train_no, train_name, train_type, route_id) values(02951, 'NDLS RAJ SPL', 'Rajdhani', 1);
-insert into train(train_no, train_name, train_type, route_id) values(02953, 'NZM Rajdhani SPL', 'Rajdhani', 2);
-insert into train(train_no, train_name, train_type, route_id) values(02903, 'MMCT ASR SPL', 'Shatabdi', 1);
-insert into train(train_no, train_name, train_type, route_id) values(09052, 'BDTS ASR SF SPL', 'Super Fast', 1);
-insert into train(train_no, train_name, train_type, route_id) values(02925, 'BDTS ASR SPL', 'Passenger', 2);
-insert into train(train_no, train_name, train_type, route_id) values(09047, 'BDTS NZM SPL', 'Shatabdi', 2);
-insert into train(train_no, train_name, train_type, route_id) values(02617, 'MANGLADWEEP EXP', 'Express', 1);
-
-insert into station(station_name) values('Churchgate');
-insert into station(station_name) values('CST');
-insert into station(station_name) values('New Delhi');
-insert into station(station_name) values('Surat');
-insert into station(station_name) values('Baroda');
-insert into station(station_name) values('Kota');
-insert into station(station_name) values('Manmad');
-insert into station(station_name) values('Nasik');
-insert into station(station_name) values('Bhopal');
-insert into station(station_name) values('Mumbai');
-
-insert into route(start, stop, via) values('Churchgate', 'New Delhi', 'Surat, Baroda, Kota');
-insert into route(start, stop, via) values('CST', 'New Delhi', 'Manmad, Bhopal, Nasik');
-
-insert into fares values(3, 'Churchgate', 'New Delhi', 575);
-insert into fares values(4, 'CST', 'New Delhi', 725);
-insert into fares values(5, 'Kota', 'Baroda', 390);
-insert into fares values(6, 'Manmad', 'Bhopal', 280);
-insert into fares values(7, 'Bhopal', 'Nasik', 440);
-insert into fares values(8, 'Surat', 'Kota', 650);
-insert into fares values(9, 'Churchgate', 'Baroda', 400);
-insert into fares values(10, 'CST', 'Bhopal', 350);
-insert into fares values(11, 'CST', 'Nasik', 460);
-insert into fares values(12, 'Mumbai', 'New Delhi', 1030);
-
-select * from train;
 select * from station;
-select * from route;
-select * from fares;
+select * from class;
 
-select * from fares where train_id=5 OR start_station='Bhopal';
-select * from train where route_id=2;
+insert into class(class_name) values('2S'), ('SL'), ('3A'), ('2A'), ('1A');
+
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(3,1,4,3,475);
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(6,7,8,5,854);
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(7,10,3,1,1039);
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(12,2,9,4,1265);
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(8,9,7,2,928);
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(10,2,8,3,786);
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(4,4,6,5,1320);
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(5,6,4,4,467);
+insert into fares(train_id, start_station, stop_station, class_id, fare) values(9,8,9,1,320);
+
+
+desc fares;
+desc train;
+select * from route;
+select * from train;
+select * from fares;
+select * from station;
+
+select count(train_type), train_type from train group by train_type;
+select * from train where train_name like '%ASR%';
+
+select train.train_id, train.train_name, train.route_id, fare
+from train
+inner join fares on
+train.train_id = fares.train_id;
+
+select train.train_id, train.train_name, train.route_id, route.via as passing_through
+from train
+inner join route on
+train.route_id = route.route_id;
+
+select train.train_id, train.train_name, train.route_id, route.start as start_station, route.stop as stop_station, 
+route.via as passing_through
+from train
+inner join route on
+train.route_id = route.route_id;
